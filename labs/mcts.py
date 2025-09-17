@@ -1,5 +1,8 @@
 # imports
 from __future__ import annotations
+
+import math
+
 import numpy as np
 import aigs
 from aigs import State, Env
@@ -22,8 +25,30 @@ def minimax(state: State, maxim: bool) -> int:
         return temp
 
 
-def alpha_beta(state: State, maxim: bool, alpha: int, beta: int) -> int:
-    raise NotImplementedError  # you do this
+def alpha_beta(state: State, maxim: bool, alpha: int, beta: int, depth: int) -> int:
+    depth += 1;
+    if state.ended or depth == 10:
+        return -state.point if maxim else state.point
+    else:
+        if maxim:
+            value = -math.inf
+            for action in state.legal:  # for all legal actions
+                if depth == 10:
+                    value = alpha
+                    break
+                value = max(value, alpha_beta(env.step(state, int(action)), not maxim, alpha, beta, depth))
+                if value >= beta:
+                    break
+                alpha = max(alpha, value)
+            return value
+        elif not maxim:
+            value = math.inf
+            for action in state.legal:  # for all legal actions
+                value = min(value, alpha_beta(env.step(state, int(action)), not maxim, alpha, beta, depth))
+                if value <= alpha:
+                    break
+                beta = min(beta, value)
+        return value
 
 
 @dataclass
@@ -63,7 +88,7 @@ def main(cfg) -> None:
     state = env.init()
 
     while not state.ended:
-        actions = np.where(state.legal)[0]  # the actions to choose from
+        actions = state.legal  # the actions to choose from
 
         match getattr(cfg, state.player):
             case "random":
@@ -78,8 +103,8 @@ def main(cfg) -> None:
                 a = actions[np.argmax(values) if state.maxim else np.argmin(values)]
 
             case "alpha_beta":
-                values = [alpha_beta(env.step(state, a), not state.maxim, -1, 1) for a in actions]
-                a = actions[np.argmax(values) if state.maxim else np.argmin(values)]
+                values = [alpha_beta(env.step(state, int(a)), not state.maxim, -math.inf, math.inf, 0) for a in actions]
+                a = int(actions[np.argmax(values) if state.maxim else np.argmin(values)])
 
             case "monte_carlo":
                 raise NotImplementedError
@@ -89,4 +114,4 @@ def main(cfg) -> None:
 
         state = env.step(state, a)
 
-    print(f"{['nobody', 'o', 'x'][state.point]} won", state, sep="\n")
+    print(f"{['nobody', 'o', 'x'][1 if state.maxim else 2]} won", state, sep="\n")

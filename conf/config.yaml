@@ -7,8 +7,12 @@ qd:
   game: "smb"
 
 mcts:
-  game: "tic_tac_toe"
+  game: "connect_four"
   maxim: "human"
-  minim: "minimax"
+  minim: "alpha_beta"
   compute: 10
   c: 0.9
+
+ann:
+  hidden: 30
+  epochs: 10
