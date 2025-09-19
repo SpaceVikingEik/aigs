@@ -27,15 +27,12 @@ def minimax(state: State, maxim: bool) -> int:
 
 def alpha_beta(state: State, maxim: bool, alpha: int, beta: int, depth: int) -> int:
     depth += 1;
-    if state.ended or depth == 10:
+    if state.ended or depth == 5:
         return -state.point if maxim else state.point
     else:
         if maxim:
             value = -math.inf
             for action in state.legal:  # for all legal actions
-                if depth == 10:
-                    value = alpha
-                    break
                 value = max(value, alpha_beta(env.step(state, int(action)), not maxim, alpha, beta, depth))
                 if value >= beta:
                     break
