@@ -9,7 +9,7 @@ qd:
 mcts:
   game: "connect_four"
   maxim: "human"
-  minim: "alpha_beta"
+  minim: "monte_carlo"
   compute: 10
   c: 0.9
 
