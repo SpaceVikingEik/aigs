@@ -25,7 +25,7 @@ def mutate(sigma, pop):  # What are we doing here?
 
 @partial(np.vectorize, signature="(d),(d)->(d)")
 def crossover(x1, x2):  # TODO: think about what we are doing here. Is it smart?
-    return x1 * np.random.rand() + x2 * (1 - np.random.rand())
+    return x1
 
 
 def step(pop, cfg):
@@ -60,7 +60,7 @@ def main(cfg):
             fitVal = fitness(env, behaviour)
             featureDescriptor = (behaviour["jumps-dist"], behaviour["enemies"])
 
-            if Archive[featureDescriptor] is None or fitVal < Archive[featureDescriptor][1]:
+            if Archive.get(featureDescriptor) is None or fitVal < Archive[featureDescriptor][1]:
                 Archive[featureDescriptor] = (newMutation, fitVal)
 
     print(Archive)
