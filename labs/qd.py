@@ -54,7 +54,7 @@ def main(cfg):
             featureDescriptor = (behaviour["jumps-dist"], behaviour["enemies"])
             Archive[featureDescriptor] = (randomMap, fitVal)
         else:
-            randomParent = random.choice(list(Archive.items()))[0]
+            randomParent = (random.choice(list(Archive.items())))[1][0]
             newMutation = crossover(randomMap, randomParent)
             behaviour = env._prob.get_stats(get_string_map(newMutation, env._prob.get_tile_types()))
             fitVal = fitness(env, behaviour)
