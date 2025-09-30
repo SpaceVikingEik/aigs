@@ -1,6 +1,7 @@
 # %% qd.py
 #   quality diversity exercises
 # by: Noah Syrkis
+import random
 
 # Imports
 import numpy as np
@@ -34,13 +35,35 @@ def step(pop, cfg):
     pop = crossover(best, best[np.random.permutation(best.shape[0])])  # mutate
     return mutate(cfg.sigma, pop), loss  # return new generation and loss
 
+def fitness (env, behaviour):
+    fitness = behaviour["jumps"]*100 - behaviour["empty"]
+    return fitness
 
 # %% Setup
 def main(cfg):
     env, pop = init_pcgym(cfg)
     map = get_string_map(env._rep._map, env._prob.get_tile_types())
-    behavior = env._prob.get_stats(map)
-    print(behavior)
+    Archive = {}
+    iterator = 0
+    while iterator < cfg.generation:
+        iterator += 1
+        randomMap = pop[random.randint(0, len(pop) - 1)]
+        if len(Archive) == 0:
+            behaviour = env._prob.get_stats(get_string_map(randomMap, env._prob.get_tile_types()))
+            fitVal = fitness(env, behaviour)
+            featureDescriptor = (behaviour["jumps-dist"], behaviour["enemies"])
+            Archive[featureDescriptor] = (randomMap, fitVal)
+        else:
+            randomParent = random.choice(list(Archive.items()))[0]
+            newMutation = crossover(randomMap, randomParent)
+            behaviour = env._prob.get_stats(get_string_map(newMutation, env._prob.get_tile_types()))
+            fitVal = fitness(env, behaviour)
+            featureDescriptor = (behaviour["jumps-dist"], behaviour["enemies"])
+
+            if Archive[featureDescriptor] is None or fitVal < Archive[featureDescriptor][1]:
+                Archive[featureDescriptor] = (newMutation, fitVal)
+
+    print(Archive)
     exit()
 
 
